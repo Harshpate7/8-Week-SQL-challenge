@@ -1,165 +1,33 @@
-# Danny's Diner - 8 Week SQL Challenge
+# **8-Week SQL Challenge**
 
-## Overview
-This repository contains the case study solution for **Danny's Diner**, part of the **8 Week SQL Challenge**. The case study revolves around Danny, who wants to analyze his restaurant's performance and customer behavior. Using SQL, we derive key business insights from the available datasets.
+## **Introduction**
+Welcome to my repository for the **8-Week SQL Challenge**, a series of case studies designed by [Danny Ma](https://8weeksqlchallenge.com/) to enhance SQL skills through real-world business scenarios. Each case study focuses on solving practical data problems using SQL techniques, ranging from basic queries to advanced analytical functions.
 
----
-
-## Problem Statement
-Danny owns a small diner and wants to:
-1. Analyze customer spending habits.
-2. Understand loyalty program performance.
-3. Optimize his menu offerings based on customer preferences.
-
-Using the provided datasets, the analysis addresses the following:
-- Customer spending.
-- Frequency of visits.
-- Most frequently purchased items.
-- Performance of loyalty members.
-- Points calculation system for loyalty members.
+This repository showcases my solutions for the first two case studies, where I have explored real-world datasets and answered complex business questions. Through these case studies, I aimed to strengthen my understanding of SQL and demonstrate my ability to derive actionable insights from data.
 
 ---
 
-## Datasets
-The case study uses three datasets:
-1. **Sales**: Transaction details including customer ID, product ID, and order date.
-2. **Menu**: Menu items with corresponding prices.
-3. **Members**: Information about customers who joined Danny's loyalty program.
+## **Case Studies Solved**
+
+### **Case Study #1: Danny's Diner**
+Analyze the performance of a fictional Japanese restaurant, focusing on customer behavior, menu preferences, and membership trends. Key objectives include understanding customer spending, visit frequency, and product popularity.
+
+### **Case Study #2: Pizza Runner**
+Examine the operational efficiency of a pizza delivery service. Key areas of analysis include runner performance, order completion times, and customer preferences.
 
 ---
 
-## SQL Analysis and Insights
+## **What’s Next?**
+I plan to continue working on the remaining case studies, expanding my knowledge and expertise in SQL while tackling diverse business challenges. Stay tuned for updates as I add more solutions to this repository.
 
-### 1. **Customer Spending**
-Query to calculate total spend by each customer:
-```sql
-SELECT
-    sales.customer_id,
-    SUM(menu.price) AS total_spend
-FROM dannys_diner.sales
-JOIN dannys_diner.menu
-ON sales.product_id = menu.product_id
-GROUP BY sales.customer_id
-ORDER BY customer_id;
-```
-### 2. **Frequency of Visits**
-Query to count the number of unique visits for each customer:
-```sql
-SELECT 
-    customer_id,
-    COUNT(DISTINCT order_date) AS visit_count
-FROM dannys_diner.sales
-GROUP BY customer_id
-ORDER BY customer_id;
-```
+---
 
-### 3. **First Purchased Item**
-Query to identify the first product purchased by each customer:
+## **Acknowledgments**
+A big thanks to Danny Ma for creating this engaging challenge and inspiring SQL enthusiasts like me to grow through practical learning.
 
-```sql
-SELECT 
-    ranked_orders.customer_id,
-    ranked_orders.product_name
-FROM (
-    SELECT 
-        sales.customer_id,
-        menu.product_name,
-        ROW_NUMBER() OVER (PARTITION BY sales.customer_id ORDER BY sales.order_date) AS rn
-    FROM dannys_diner.sales
-    LEFT JOIN dannys_diner.menu
-    ON sales.product_id = menu.product_id
-) AS ranked_orders
-WHERE rn = 1;
-```
+---
 
-### 4. **Most Popular Items**
-Query to find the most frequently purchased products:
+Feel free to explore my solutions and share your feedback. Let’s connect and discuss data challenges!
 
-```sql
-SELECT
-    menu.product_name,
-    COUNT(menu.product_id) AS purchase_count
-FROM dannys_diner.sales
-JOIN dannys_diner.menu
-ON sales.product_id = menu.product_id
-GROUP BY menu.product_name
-ORDER BY purchase_count DESC;
-```
-
-### 5. **Top Products by Customer**
-Query to get the most purchased product for each customer:
-
-```sql
-SELECT 
-    ranked_orders.customer_id,
-    ranked_orders.product_name
-FROM (
-    SELECT 
-        sales.customer_id,
-        menu.product_name,
-        COUNT(sales.product_id) AS purchase_count,
-        RANK() OVER (PARTITION BY sales.customer_id ORDER BY COUNT(menu.product_name) DESC) AS rn
-    FROM dannys_diner.sales
-    LEFT JOIN dannys_diner.menu
-    ON sales.product_id = menu.product_id
-    GROUP BY sales.customer_id, menu.product_name
-) AS ranked_orders
-WHERE rn = 1;
-```
-
-### 6. **First Purchase After Joining**
-Query to find the first purchase made by loyalty members after joining the program:
-```sql
-SELECT 
-    sales.customer_id,
-    menu.product_name,
-    sales.order_date,
-    members.join_date
-FROM sales
-JOIN menu ON sales.product_id = menu.product_id
-JOIN members ON sales.customer_id = members.customer_id
-WHERE sales.order_date = (
-    SELECT MIN(order_date)
-    FROM sales AS sub_sales
-    WHERE 
-        sub_sales.customer_id = sales.customer_id
-        AND sub_sales.order_date >= members.join_date
-)
-ORDER BY sales.order_date;
-```
-
-### 7. **Points Calculation**
-Query to calculate loyalty points for purchases:
-```sql
-WITH customer_points AS (
-    SELECT 
-        sales.customer_id,
-        menu.product_name,
-        menu.price,
-        CASE  
-            WHEN product_name = 'sushi' THEN price * 20
-            ELSE price * 10
-        END AS points
-    FROM sales
-    JOIN menu
-    ON sales.product_id = menu.product_id
-)
-SELECT 
-    customer_points.customer_id,
-    SUM(points) AS total_points
-FROM customer_points
-GROUP BY customer_points.customer_id
-ORDER BY customer_id;
-```
-
-## Tools and Technologies
-- SQL: To query and analyze the datasets.
-- PostgreSQL: The database environment used for executing queries.
-
-## Key Takeaways
-
-- Customer spending patterns show key trends in revenue generation.
-- Loyalty programs drive significant value, especially through high-reward items like sushi.
-- Menu insights help prioritize the most popular and profitable items for better inventory and marketing strategies.
 
 
